@@ -6,7 +6,9 @@
   "scripts": {
     "lint": "yarn run eslint && yarn run format",
     "format": "prettier --config .prettierrc.js --write 'src/**/*.js'",
-    "eslint": "eslint --fix 'src/**/*.js'"
+    "eslint": "eslint --fix 'src/**/*.js'",
+    "dev": "webpack --watch --mode=development",
+    "build": "webpack"
   },
   "devDependencies": {
     "eslint": "^5.9.0",
