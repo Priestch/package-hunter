@@ -10,7 +10,7 @@
   "content_scripts": [
     {
       "matches": ["*://pypi.org/search/?q=*"],
-      "css": ["contentscripts.css"],
+      "css": ["styles.css"],
       "js": ["app.js"]
     }
   ],

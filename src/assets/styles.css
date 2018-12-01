@@ -1,0 +1,29 @@
+.gh-repo-anchor {
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  width: 70px;
+  height: 100%;
+  background: #d3d3d3;
+}
+
+.gh-repo-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: stretch;
+}
+
+.gh-repo-card .gh-item {
+  display: inline-block;
+  text-align: center;
+  font-size: 14px;
+  border: none;
+  width: 100%;
+}
+
+.gh-repo-card .gh-item .fa {
+  margin-right: 5px;
+}

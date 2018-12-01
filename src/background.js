@@ -13,7 +13,10 @@ async function parseRepoURL(packageURL) {
 }
 
 async function fetchRepoData(repoURL) {
-  return http.get(repoURL);
+  const params = {
+    access_token: '581c59dc35f9ad9bd0e98f348f69a6aabc1ae602',
+  };
+  return http.get(repoURL, { params });
 }
 
 async function dispatchEvent({ messageType, data }, sender, sendResponse) {
