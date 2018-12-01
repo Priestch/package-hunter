@@ -8,9 +8,10 @@
     "format": "prettier --config .prettierrc.js --write 'src/**/*.js'",
     "eslint": "eslint --fix 'src/**/*.js'",
     "dev": "webpack --watch --mode=development",
-    "build": "webpack"
+    "build": "webpack --mode=production"
   },
   "devDependencies": {
+    "copy-webpack-plugin": "^4.6.0",
     "eslint": "^5.9.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-config-prettier": "^3.3.0",
@@ -19,5 +20,9 @@
     "prettier": "^1.15.3",
     "webpack": "^4.26.1",
     "webpack-cli": "^3.1.2"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "lit-html": "^0.14.0"
   }
 }

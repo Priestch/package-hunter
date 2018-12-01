@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "Python Package Helper Extension",
+  "description": "Make you easy when you search package on pypi",
+  "version": "1.0",
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_title": "Luoo"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://pypi.org/search/?q=*"],
+      "css": ["contentscripts.css"],
+      "js": ["app.js"]
+    }
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "permissions": [
+    "https://pypi.org/*",
+    "https://github.com/*"
+  ]
+}
