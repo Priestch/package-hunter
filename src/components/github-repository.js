@@ -4,7 +4,7 @@ export default class GithubRepository {
     this.repoData = null;
   }
 
-  createIcon(classes) {
+  static createIcon(classes) {
     const icon = document.createElement('i');
     for (let i = 0; i < classes.length; i++) {
       const cssClass = classes[i];
@@ -52,7 +52,7 @@ export default class GithubRepository {
     if (repoData !== null) {
       this.repoData = repoData;
       const component = this.createComponent();
-      return container.appendChild(component);
+      container.appendChild(component);
     }
   }
 }
