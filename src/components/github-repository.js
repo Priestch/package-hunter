@@ -13,10 +13,10 @@ export default class GithubRepository {
     return icon;
   }
 
-  createListItem(text, iconClasses) {
+  static createListItem(text, iconClasses) {
     const itemEle = document.createElement('li');
     itemEle.classList.add('gh-item');
-    const forkIcon = this.createIcon(iconClasses);
+    const forkIcon = GithubRepository.createIcon(iconClasses);
     itemEle.appendChild(forkIcon);
     itemEle.appendChild(document.createTextNode(text));
     return itemEle;
@@ -25,14 +25,14 @@ export default class GithubRepository {
   createListElement() {
     const itemList = document.createElement('ul');
     itemList.classList.add('gh-repo-card');
-    const starItem = this.createListItem(this.repoData.stargazers_count, [
-      'fa',
-      'fa-star',
-    ]);
-    const forkItem = this.createListItem(this.repoData.forks_count, [
-      'fa',
-      'fa-code-branch',
-    ]);
+    const starItem = GithubRepository.createListItem(
+      this.repoData.stargazers_count,
+      ['fa', 'fa-star'],
+    );
+    const forkItem = GithubRepository.createListItem(
+      this.repoData.forks_count,
+      ['fa', 'fa-code-branch'],
+    );
     itemList.appendChild(starItem);
     itemList.appendChild(forkItem);
     return itemList;
