@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "lint": "yarn run eslint && yarn run format",
-    "format": "prettier --config .prettierrc.js --write 'src/**/*.js'",
-    "eslint": "eslint --fix 'src/**/*.js'",
+    "format": "prettier --config .prettierrc.js --write '**/*.js'",
+    "eslint": "eslint --fix '**/*.js'",
     "dev": "webpack --watch --mode=development",
     "build": "yarn lint && webpack --mode=production"
   },
@@ -17,11 +17,23 @@
     "eslint-config-prettier": "^3.3.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-prettier": "^3.0.0",
+    "husky": "^1.2.0",
+    "lint-staged": "^8.1.0",
     "prettier": "^1.15.3",
     "webpack": "^4.26.1",
     "webpack-cli": "^3.1.2"
   },
   "dependencies": {
     "axios": "^0.18.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix"
+    ]
   }
 }
