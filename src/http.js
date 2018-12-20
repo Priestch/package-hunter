@@ -4,6 +4,8 @@ const http = axios.create({
   timeout: 30 * 1e3,
 });
 
+axios.defaults.headers.common.Accept = 'application/json';
+
 http.interceptors.response.use(
   response => response,
   error => {

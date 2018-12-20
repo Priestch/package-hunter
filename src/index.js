@@ -1,4 +1,5 @@
 import GithubRepository from './components/github-repository';
+import oauth from './oauth';
 
 function findPagePackages() {
   return document.querySelector('#content .left-layout__main ul.unstyled');
@@ -20,17 +21,25 @@ function collectPagePackages() {
   return packages;
 }
 
+function sendMessage(message, callback) {
+  chrome.runtime.sendMessage(message, callback);
+}
+
 function getRepoData({ pkgURL, domContainer }) {
   return new Promise(resolve => {
     const message = {
       messageType: 'getRepoData',
       data: pkgURL,
     };
-    chrome.runtime.sendMessage(message, repoData => {
-      const repoComponent = new GithubRepository(pkgURL);
-      repoComponent.render(domContainer, repoData);
+    const callback = repoData => {
+      // console.log('repoData', pkgURL, repoData);
+      if (!(repoData instanceof Error)) {
+        const repoComponent = new GithubRepository(pkgURL);
+        repoComponent.render(domContainer, repoData);
+      }
       resolve(repoData);
-    });
+    };
+    sendMessage(message, callback);
   });
 }
 
@@ -51,7 +60,23 @@ async function getRepos(packages) {
   }
 }
 
-function main() {
+async function authorize() {
+  return new Promise(resolve => {
+    const callback = data => {
+      resolve(data);
+    };
+    const message = {
+      messageType: 'authorize',
+      data: '',
+    };
+    sendMessage(message, callback);
+  });
+}
+
+async function main() {
+  if (!oauth.access_token) {
+    await authorize();
+  }
   const packages = collectPagePackages();
   getRepos(packages);
 }

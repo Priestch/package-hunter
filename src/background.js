@@ -1,6 +1,35 @@
 import http from './http';
 import { PACKAGE_HOST } from './constants';
 
+import oauth from './oauth';
+
+function getAccessCode(code) {
+  const data = {
+    client_id: oauth.client_id,
+    client_secret: oauth.client_secret,
+    code,
+  };
+  return http.post('https://github.com/login/oauth/access_token', data);
+}
+
+async function authorizeGithub() {
+  return new Promise(resolve => {
+    const options = {
+      url:
+        'https://github.com/login/oauth/authorize?client_id=e53dc3c347023cc17726&scope=repo',
+      interactive: true,
+    };
+    chrome.identity.launchWebAuthFlow(options, redirectUrl => {
+      const urlSearch = redirectUrl.split('?')[1];
+      const tempCode = new URLSearchParams(urlSearch).get('code');
+      getAccessCode(tempCode).then(resp => {
+        oauth.access_token = resp.data.access_token;
+        resolve(redirectUrl);
+      });
+    });
+  });
+}
+
 async function parseRepoURL(packageURL) {
   const resp = await http.get(packageURL);
   const parser = new DOMParser();
@@ -13,7 +42,8 @@ async function parseRepoURL(packageURL) {
 }
 
 async function fetchRepoData(repoURL) {
-  return http.get(repoURL);
+  const params = { access_token: oauth.access_token };
+  return http.get(repoURL, { params });
 }
 
 async function dispatchEvent({ messageType, data }, sender, sendResponse) {
@@ -27,8 +57,15 @@ async function dispatchEvent({ messageType, data }, sender, sendResponse) {
         result = null;
         break;
       }
-      resp = await fetchRepoData(repoURL);
-      result = resp.data;
+      try {
+        resp = await fetchRepoData(repoURL);
+        result = resp.data;
+      } catch (e) {
+        result = null;
+      }
+      break;
+    case 'authorize':
+      result = await authorizeGithub();
       break;
     default:
       break;

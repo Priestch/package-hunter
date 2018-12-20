@@ -14,12 +14,20 @@
       "js": ["app.js"]
     }
   ],
+  "key": "fkbbiniadlppgncanioiajphnlbickni",
   "background": {
     "scripts": ["background.js"],
     "persistent": false
   },
   "permissions": [
+    "identity",
     "https://pypi.org/*",
     "https://github.com/*"
-  ]
+  ],
+  "oauth2": {
+    "client_id": "e53dc3c347023cc17726",
+    "scopes":[
+      "https://github.com/login/oauth/authorize"
+    ]
+  }
 }
