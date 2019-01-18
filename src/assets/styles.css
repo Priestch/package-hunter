@@ -1,3 +1,7 @@
+.left-layout__main .unstyled > li {
+  position: relative;
+}
+
 .gh-repo-anchor {
   display: block;
   position: absolute;
