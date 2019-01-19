@@ -1,1 +1,1 @@
-# Ease you programmer when try to find a packages.
+# Make you programmer life easier when try to find packages!
