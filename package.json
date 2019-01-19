@@ -8,7 +8,8 @@
     "format": "prettier --config .prettierrc.js --write '**/*.js'",
     "eslint": "eslint --fix '**/*.js'",
     "dev": "webpack --watch --mode=development",
-    "build": "yarn lint && webpack --mode=production"
+    "build": "yarn lint && webpack --mode=production",
+    "release": "yarn run build && bash ./bin/release.sh"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^4.6.0",

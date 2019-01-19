@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Python Package Helper Extension",
   "description": "Make you easy when you search package on pypi",
-  "version": "1.0",
+  "version": "1.0.1",
   "browser_action": {
     "default_icon": "icon.png",
     "default_title": "Luoo"
@@ -14,7 +14,6 @@
       "js": ["app.js"]
     }
   ],
-  "key": "fkbbiniadlppgncanioiajphnlbickni",
   "background": {
     "scripts": ["background.js"],
     "persistent": false
