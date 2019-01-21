@@ -43,11 +43,13 @@ function convertRepoData(repoData) {
     repository: {
       forkCount,
       stargazers: { totalCount },
+      url,
     },
   } = repoData.data;
   return {
     forkCount,
     starCount: totalCount,
+    url,
   };
 }
 

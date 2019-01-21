@@ -1,6 +1,5 @@
 export default class GithubRepository {
-  constructor(URL) {
-    this.URL = URL;
+  constructor() {
     this.repoData = null;
   }
 
@@ -41,7 +40,7 @@ export default class GithubRepository {
   createComponent() {
     const component = document.createElement('a');
     component.classList.add('gh-repo-anchor');
-    component.setAttribute('href', this.URL);
+    component.setAttribute('href', this.repoData.url);
     const listElement = this.createListElement();
     component.appendChild(listElement);
 

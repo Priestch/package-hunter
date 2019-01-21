@@ -18,7 +18,8 @@ function getGithubRepo(repoURL, accessToken) {
           forkCount,
           stargazers {
             totalCount
-          }
+          },
+          url
         }
       }
     `,
