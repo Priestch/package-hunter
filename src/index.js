@@ -57,7 +57,16 @@ function renderRepoData(pkgURL, domContainer, resolve) {
       console.error('renderRepoData', pkgURL, rawRepoData);
       return;
     }
-    const repoData = convertRepoData(rawRepoData);
+    let repoData;
+    try {
+      repoData = convertRepoData(rawRepoData);
+    } catch (e) {
+      console.log(
+        'Error happened when fetching Repo data',
+        pkgURL,
+        rawRepoData,
+      );
+    }
     if (!(repoData instanceof Error)) {
       const repoComponent = new GithubRepository(pkgURL);
       repoComponent.render(domContainer, repoData);
