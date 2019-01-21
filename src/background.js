@@ -1,5 +1,6 @@
 import http from './http';
 import { PACKAGE_HOST } from './constants';
+import api from './api';
 
 import oauth from './oauth';
 
@@ -42,8 +43,7 @@ async function parseRepoURL(packageURL) {
 }
 
 async function fetchRepoData(repoURL) {
-  const params = { access_token: oauth.access_token };
-  return http.get(repoURL, { params });
+  return api.getGithubRepo(repoURL, oauth.access_token);
 }
 
 async function dispatchEvent({ messageType, data }, sender, sendResponse) {

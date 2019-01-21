@@ -3,6 +3,11 @@ import oauth from './oauth';
 
 const pkgElementRatio = {};
 
+const RepoTaskStatus = {
+  PENDING: 0,
+  RESOLVED: 1,
+};
+
 function findPagePackages() {
   return document.querySelector('#content .left-layout__main ul.unstyled');
 }
@@ -33,14 +38,32 @@ function sendMessage(message, callback) {
   chrome.runtime.sendMessage(message, callback);
 }
 
+function convertRepoData(repoData) {
+  const {
+    repository: {
+      forkCount,
+      stargazers: { totalCount },
+    },
+  } = repoData.data;
+  return {
+    forkCount,
+    starCount: totalCount,
+  };
+}
+
 function renderRepoData(pkgURL, domContainer, resolve) {
-  return repoData => {
-    // console.log('repoData', pkgURL, repoData);
+  return rawRepoData => {
+    if (rawRepoData === null) {
+      console.error('renderRepoData', pkgURL, rawRepoData);
+      return;
+    }
+    const repoData = convertRepoData(rawRepoData);
     if (!(repoData instanceof Error)) {
       const repoComponent = new GithubRepository(pkgURL);
       repoComponent.render(domContainer, repoData);
       /* eslint-disable no-param-reassign */
-      domContainer.dataset.repoResolved = 'true';
+      domContainer.dataset.repoStatus = RepoTaskStatus.RESOLVED;
+      console.log(pkgURL, domContainer.dataset.repoStatus);
     }
     resolve(repoData);
   };
@@ -48,13 +71,13 @@ function renderRepoData(pkgURL, domContainer, resolve) {
 
 function getRepoData({ pkgURL, domContainer }) {
   return new Promise(resolve => {
-    console.log(domContainer.dataset.repoResolved);
-    if (domContainer.dataset.repoResolved) {
-      console.log(pkgURL, 'before resolved');
+    if (domContainer.dataset.repoStatus) {
       resolve();
       return;
     }
-    console.log(domContainer.dataset.repoResolved, pkgURL, 'after resolved');
+    /* eslint-disable no-param-reassign */
+    domContainer.dataset.repoStatus = RepoTaskStatus.PENDING;
+    console.log(pkgURL, domContainer.dataset.repoStatus);
     const message = {
       messageType: 'getRepoData',
       data: pkgURL,
@@ -92,13 +115,11 @@ async function authorize() {
   });
 }
 
-function callbackRouter(entries) {
-  console.log('callbackRouter');
+function pkgEnterViewportCallback(entries) {
   const entry = entries[0];
   const pkgURL = getPackageURL(entry.target);
   const prevRatio = pkgElementRatio[pkgURL];
   if (entry.intersectionRatio > prevRatio && entry.intersectionRatio > 0.95) {
-    console.log(entry.target, 'is going enter viewport...');
     const pkgData = { pkgURL, domContainer: entry.target };
     getRepoData(pkgData);
   }
@@ -112,7 +133,7 @@ function observeRepoElement() {
     threshold: [0.8, 1],
   };
 
-  const observer = new IntersectionObserver(callbackRouter, options);
+  const observer = new IntersectionObserver(pkgEnterViewportCallback, options);
   const boxes = document.querySelectorAll('.left-layout__main .unstyled > li');
   for (let i = 0; i < boxes.length; i++) {
     const box = boxes[i];

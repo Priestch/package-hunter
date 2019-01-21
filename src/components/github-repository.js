@@ -25,14 +25,14 @@ export default class GithubRepository {
   createListElement() {
     const itemList = document.createElement('ul');
     itemList.classList.add('gh-repo-card');
-    const starItem = GithubRepository.createListItem(
-      this.repoData.stargazers_count,
-      ['fa', 'fa-star'],
-    );
-    const forkItem = GithubRepository.createListItem(
-      this.repoData.forks_count,
-      ['fa', 'fa-code-branch'],
-    );
+    const starItem = GithubRepository.createListItem(this.repoData.starCount, [
+      'fa',
+      'fa-star',
+    ]);
+    const forkItem = GithubRepository.createListItem(this.repoData.forkCount, [
+      'fa',
+      'fa-code-branch',
+    ]);
     itemList.appendChild(starItem);
     itemList.appendChild(forkItem);
     return itemList;
@@ -41,7 +41,7 @@ export default class GithubRepository {
   createComponent() {
     const component = document.createElement('a');
     component.classList.add('gh-repo-anchor');
-    component.setAttribute('href', this.repoData.html_url);
+    component.setAttribute('href', this.URL);
     const listElement = this.createListElement();
     component.appendChild(listElement);
 
