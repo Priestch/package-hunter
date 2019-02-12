@@ -70,7 +70,7 @@ function renderRepoData(pkgURL, domContainer, resolve) {
       );
     }
     if (!(repoData instanceof Error)) {
-      const repoComponent = new GithubRepository(pkgURL);
+      const repoComponent = new GithubRepository();
       repoComponent.render(domContainer, repoData);
       /* eslint-disable no-param-reassign */
       domContainer.dataset.repoStatus = RepoTaskStatus.RESOLVED;
