@@ -1,18 +1,17 @@
 {
   "name": "package-hunter",
   "version": "1.0.1-1",
-  "main": "index.js",
   "license": "MIT",
   "scripts": {
     "lint": "yarn run eslint && yarn run format",
     "format": "prettier --config .prettierrc.js --write '**/*.js'",
     "eslint": "eslint --fix '**/*.js'",
-    "dev": "webpack --watch --mode=development",
-    "build": "yarn lint && webpack --mode=production",
+    "start": "parcel watch src/manifest.json --host localhost",
+    "build": "parcel build src/manifest.json",
     "release": "yarn run build && bash ./bin/release.sh"
   },
   "devDependencies": {
-    "copy-webpack-plugin": "^4.6.0",
+    "@parcel/config-webextension": "^2.8.2",
     "eslint": "^5.9.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-config-prettier": "^3.3.0",
@@ -20,12 +19,12 @@
     "eslint-plugin-prettier": "^3.0.0",
     "husky": "^1.2.0",
     "lint-staged": "^8.1.0",
-    "prettier": "^1.15.3",
-    "webpack": "^5.0.0-alpha.8",
-    "webpack-cli": "^3.1.2"
+    "parcel": "^2.8.2",
+    "prettier": "^1.15.3"
   },
   "dependencies": {
-    "axios": "^0.18.0"
+    "axios": "^0.18.0",
+    "redaxios": "^0.5.1"
   },
   "husky": {
     "hooks": {

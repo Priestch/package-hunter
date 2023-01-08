@@ -3,30 +3,31 @@
   "name": "Package Hunter",
   "description": "Make you easy when you search package on pypi",
   "version": "1.0.3",
-  "browser_action": {
-    "default_icon": "icon.png",
-    "default_title": "Luoo"
-  },
   "content_scripts": [
     {
-      "matches": ["*://pypi.org/search/?q=*"],
-      "css": ["styles.css"],
-      "js": ["app.js"]
+      "matches": ["*://pypi.org/search/?*"],
+      "css": ["assets/styles.css"],
+      "js": ["index.js"]
     }
   ],
   "background": {
     "scripts": ["background.js"],
     "persistent": false
   },
+  "page_action": {
+    "default_popup": "popup.html"
+  },
   "permissions": [
     "identity",
     "https://pypi.org/*",
-    "https://github.com/*"
+    "https://github.com/*",
+    "*://*/*"
   ],
   "oauth2": {
     "client_id": "e53dc3c347023cc17726",
     "scopes":[
-      "https://github.com/login/oauth/authorize"
+      "https://github.com/login/oauth/authorize/"
     ]
-  }
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAomI8jtSlm7hRXw6glqbgAMOjlzDhZtnIqyR/XQcRd/KPnH29a97hnIWlM0Zxxs8YGNIy95Zt6MilZLi6Rg/9r4zqgRyrtQL+H9udUGCm1D8CCVS3t3kxNgQp4egPqG/Y4/ejlsOGoaiRackLAJM4SSGLeQCa4EYBjHsAptOO9XAsPLLtdRNeiiIlZAPfIifsvRQ/vmifUTmTbwShAUw4qlb9e0KJP/o66np1lKGu5LWtZOcDUTUiDpZYLPWBDyK4rl5x7hfeVZ4BLewEn44yAuINGF1kBFJjGMxLwDpHEAm/x303z7lNRbvAQIS0RoMxHrp2hccnsW0lDfocFp80NQIDAQAB"
 }

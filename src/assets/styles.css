@@ -6,9 +6,9 @@
   display: block;
   position: absolute;
   top: 0;
-  right: 0;
+  right: -60px;
   margin: 0;
-  width: 70px;
+  width: 60px;
   height: 100%;
   background: #d3d3d3;
 }
@@ -16,6 +16,7 @@
 .gh-repo-anchor:hover,
 .gh-repo-anchor:focus {
   text-decoration: none;
+  background: #d3d3d3;
 }
 
 .gh-repo-card {

@@ -35,6 +35,7 @@ function collectPagePackages() {
 }
 
 function sendMessage(message, callback) {
+  console.log('sendMessage', message);
   chrome.runtime.sendMessage(message, callback);
 }
 
@@ -55,6 +56,7 @@ function convertRepoData(repoData) {
 
 function renderRepoData(pkgURL, domContainer, resolve) {
   return rawRepoData => {
+    console.log('rawRepoData', rawRepoData);
     if (rawRepoData === null) {
       console.error('renderRepoData', pkgURL, rawRepoData);
       return;
@@ -68,6 +70,7 @@ function renderRepoData(pkgURL, domContainer, resolve) {
         pkgURL,
         rawRepoData,
       );
+      console.error(e);
     }
     if (!(repoData instanceof Error)) {
       const repoComponent = new GithubRepository();
@@ -81,6 +84,7 @@ function renderRepoData(pkgURL, domContainer, resolve) {
 }
 
 function getRepoData({ pkgURL, domContainer }) {
+  console.log('getRepoData', pkgURL);
   return new Promise(resolve => {
     if (domContainer.dataset.repoStatus) {
       resolve();
@@ -153,7 +157,9 @@ function observeRepoElement() {
 }
 
 async function main() {
+  console.log('main', oauth.access_token);
   if (!oauth.access_token) {
+    console.log('authorize');
     await authorize();
   }
 

@@ -10,3 +10,5 @@ release/
 
 dist.crx
 dist.pem
+
+.parcel-cache

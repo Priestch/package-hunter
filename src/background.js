@@ -1,8 +1,9 @@
 import http from './http';
-import { PACKAGE_HOST } from './constants';
 import api from './api';
 
 import oauth from './oauth';
+
+const PACKAGE_HOST = 'https://pypi.org';
 
 function getAccessCode(code) {
   const data = {
@@ -32,14 +33,17 @@ async function authorizeGithub() {
 }
 
 async function parseRepoURL(packageURL) {
-  const resp = await http.get(packageURL);
+  const response = await fetch(packageURL);
+  const docText = await response.text();
   const parser = new DOMParser();
-  const loadedHTML = parser.parseFromString(resp.data, 'text/html');
-  const repoElement = loadedHTML.querySelector('#content .github-repo-info');
+  const loadedHTML = parser.parseFromString(docText, 'text/html');
+  const repoElement = loadedHTML.querySelector(
+    '#content [data-controller="github-repo-info"]',
+  );
   if (repoElement === null) {
     return null;
   }
-  return repoElement.dataset.url;
+  return repoElement.dataset.githubRepoInfoUrlValue;
 }
 
 async function fetchRepoData(repoURL) {
@@ -53,6 +57,7 @@ async function dispatchEvent({ messageType, data }, sender, sendResponse) {
   switch (messageType) {
     case 'getRepoData':
       repoURL = await parseRepoURL(`${PACKAGE_HOST}${data}`);
+      console.log('getRepoData', repoURL);
       if (repoURL === null) {
         result = null;
         break;
