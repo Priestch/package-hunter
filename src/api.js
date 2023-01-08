@@ -9,31 +9,25 @@ function parseRepoURL(repoURL) {
   };
 }
 
-function getGithubRepo(repoURL, accessToken) {
+async function getGithubRepo(repoURL, accessToken) {
   const { owner, repoName } = parseRepoURL(repoURL);
-  const data = {
-    query: `
-      query {
-        repository(owner:"${owner}", name:"${repoName}") {
-          forkCount,
-          stargazers {
-            totalCount
-          },
-          url
-        }
-      }
-    `,
-  };
   const headers = {
     Authorization: `Bearer ${accessToken}`,
   };
   const options = {
-    url: 'https://api.github.com/graphql',
-    method: 'POST',
+    url: `https://api.github.com/repos/${owner}/${repoName}`,
+    method: 'GET',
     headers,
-    data,
   };
-  return http(options);
+  const response = await http(options);
+
+  return {
+    forkCount: response.data.forks,
+    stargazers: {
+      totalCount: response.data.stargazers_count,
+    },
+    url: response.data.html_url,
+  };
 }
 
 export default {

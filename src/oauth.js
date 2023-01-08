@@ -1,3 +1,3 @@
 export default {
-  access_token: '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',
+  access_token: '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',
 };

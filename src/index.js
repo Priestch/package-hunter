@@ -41,12 +41,10 @@ function sendMessage(message, callback) {
 
 function convertRepoData(repoData) {
   const {
-    repository: {
-      forkCount,
-      stargazers: { totalCount },
-      url,
-    },
-  } = repoData.data;
+    forkCount,
+    stargazers: { totalCount },
+    url,
+  } = repoData;
   return {
     forkCount,
     starCount: totalCount,
@@ -56,7 +54,6 @@ function convertRepoData(repoData) {
 
 function renderRepoData(pkgURL, domContainer, resolve) {
   return rawRepoData => {
-    console.log('rawRepoData', rawRepoData);
     if (rawRepoData === null) {
       console.error('renderRepoData', pkgURL, rawRepoData);
       return;

@@ -53,18 +53,15 @@ async function fetchRepoData(repoURL) {
 async function dispatchEvent({ messageType, data }, sender, sendResponse) {
   let result = null;
   let repoURL = null;
-  let resp = null;
   switch (messageType) {
     case 'getRepoData':
       repoURL = await parseRepoURL(`${PACKAGE_HOST}${data}`);
-      console.log('getRepoData', repoURL);
       if (repoURL === null) {
         result = null;
         break;
       }
       try {
-        resp = await fetchRepoData(repoURL);
-        result = resp.data;
+        result = await fetchRepoData(repoURL);
       } catch (e) {
         result = null;
       }
