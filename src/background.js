@@ -37,13 +37,16 @@ async function parseRepoURL(packageURL) {
   const docText = await response.text();
   const parser = new DOMParser();
   const loadedHTML = parser.parseFromString(docText, 'text/html');
-  const repoElement = loadedHTML.querySelector(
-    '#content [data-controller="github-repo-info"]',
+  const statsEl = loadedHTML.querySelector(
+    '#content [data-controller="github-repo-stats"]',
   );
-  if (repoElement === null) {
+  if (statsEl === null) {
     return null;
   }
-  return repoElement.dataset.githubRepoInfoUrlValue;
+  const statsUrlText = statsEl.dataset.githubRepoStatsUrlValue;
+  const statsUrl = new URL(statsUrlText);
+  console.log(statsUrl, statsUrl.pathname);
+  return statsUrl.pathname.replace('/repos', '');
 }
 
 async function fetchRepoData(repoURL) {

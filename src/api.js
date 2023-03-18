@@ -9,24 +9,27 @@ function parseRepoURL(repoURL) {
   };
 }
 
-async function getGithubRepo(repoURL, accessToken) {
-  const { owner, repoName } = parseRepoURL(repoURL);
-  const headers = {
-    Authorization: `Bearer ${accessToken}`,
+async function getGithubRepo(repoPath) {
+  const { owner, repoName } = parseRepoURL(repoPath);
+  const repoURL = `https://github.com/${owner}/${repoName}`;
+  const config = {
+    responseType: 'document',
+    headers: {
+      Accept: 'text/html',
+    },
   };
-  const options = {
-    url: `https://api.github.com/repos/${owner}/${repoName}`,
-    method: 'GET',
-    headers,
-  };
-  const response = await http(options);
+  const response = await http.get(repoURL, config);
+
+  const loadedHTML = response.data;
+  const forkEl = loadedHTML.getElementById('repo-network-counter');
+  const starEl = loadedHTML.getElementById('repo-stars-counter-unstar');
 
   return {
-    forkCount: response.data.forks,
+    forkCount: forkEl.textContent,
     stargazers: {
-      totalCount: response.data.stargazers_count,
+      totalCount: starEl.textContent,
     },
-    url: response.data.html_url,
+    url: repoURL,
   };
 }
 
