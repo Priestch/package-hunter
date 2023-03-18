@@ -1,5 +1,4 @@
 import GithubRepository from './components/github-repository';
-import oauth from './oauth';
 
 const pkgElementRatio = {};
 
@@ -70,6 +69,7 @@ function renderRepoData(pkgURL, domContainer, resolve) {
       console.error(e);
     }
     if (!(repoData instanceof Error)) {
+      console.log("repoData", repoData);
       const repoComponent = new GithubRepository();
       repoComponent.render(domContainer, repoData);
       /* eslint-disable no-param-reassign */
@@ -114,19 +114,6 @@ async function getRepos(packages, step = 2) {
   }
 }
 
-async function authorize() {
-  return new Promise(resolve => {
-    const callback = data => {
-      resolve(data);
-    };
-    const message = {
-      messageType: 'authorize',
-      data: '',
-    };
-    sendMessage(message, callback);
-  });
-}
-
 function pkgEnterViewportCallback(entries) {
   const entry = entries[0];
   const pkgURL = getPackageURL(entry.target);
@@ -154,12 +141,6 @@ function observeRepoElement() {
 }
 
 async function main() {
-  console.log('main', oauth.access_token);
-  if (!oauth.access_token) {
-    console.log('authorize');
-    await authorize();
-  }
-
   observeRepoElement();
 
   const packages = collectPagePackages();
