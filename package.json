@@ -6,6 +6,8 @@
     "lint": "yarn run eslint && yarn run format",
     "format": "prettier --config .prettierrc.js --write '**/*.js'",
     "eslint": "eslint --fix '**/*.js'",
+    "prebuild": "rm -rf dist",
+    "postbuild": "zip -rjq package-hunter.zip dist",
     "start": "parcel watch src/manifest.json --host localhost",
     "build": "parcel build src/manifest.json",
     "release": "yarn run build && bash ./bin/release.sh"

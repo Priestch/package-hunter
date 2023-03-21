@@ -12,3 +12,5 @@ dist.crx
 dist.pem
 
 .parcel-cache
+
+*.zip
