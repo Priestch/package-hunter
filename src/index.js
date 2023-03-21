@@ -35,6 +35,7 @@ class Package {
     this.name = name;
     this.detailUrl = options.detailUrl;
     this.el = options.el;
+    this.repoUrl = null;
   }
 
   /**
@@ -55,25 +56,27 @@ class Package {
 
   static fromDOM(el) {
     const detailUrl = getPackageURL(el);
-    return new Package('name', { detailUrl, el });
+    return new Package(detailUrl, { detailUrl, el });
   }
 }
+
+const packageManager = new Map();
 
 /**
  * @return {Package[]}
  */
 function collectPagePackages() {
+  packageManager.clear();
   const pkgListElement = findPagePackages();
-  const packages = [];
   for (let i = 0; i < pkgListElement.children.length; i++) {
     const child = pkgListElement.children[i];
-    packages.push(Package.fromDOM(child));
+    const pkg = Package.fromDOM(child);
+    packageManager.set(pkg.name, pkg);
   }
-  return packages;
 }
 
 function sendMessage(message, callback) {
-  console.log('sendMessage', message);
+  // console.log('sendMessage', message);
   chrome.runtime.sendMessage(message, callback);
 }
 
@@ -136,6 +139,24 @@ function getRepoData({ detailUrl, el }) {
   });
 }
 
+async function getGithubRepoData(repoUrl, el) {
+  return new Promise(resolve => {
+    if (el.dataset.repoStatus) {
+      resolve();
+      return;
+    }
+    /* eslint-disable no-param-reassign */
+    el.dataset.repoStatus = RepoTaskStatus.PENDING;
+    const message = {
+      messageType: 'getGithubRepoData',
+      data: repoUrl,
+    };
+    sendMessage(message, function(data) {
+      resolve(data);
+    });
+  });
+}
+
 function getRepoDataByStep(start, step, packages) {
   const stepPromises = [];
   const stepPackages = packages.slice(start, start + step);
@@ -145,7 +166,7 @@ function getRepoDataByStep(start, step, packages) {
   return Promise.all(stepPromises);
 }
 
-/* eslint-disable no-await-in-loop */
+/* eslint-disable */
 async function getRepos(packages, step = 2) {
   for (let i = 0; i < packages.length; i += step) {
     await getRepoDataByStep(i, step, packages);
@@ -163,6 +184,7 @@ function pkgEnterViewportCallback(entries) {
   pkgElementRatio[pkgURL] = entry.intersectionRatio;
 }
 
+// eslint-disable-next-line no-unused-vars
 function observeRepoElement() {
   const options = {
     root: null,
@@ -179,14 +201,39 @@ function observeRepoElement() {
 }
 
 async function main() {
-  observeRepoElement();
+  // observeRepoElement();
 
-  const packages = collectPagePackages();
+  collectPagePackages();
+  const packages = Array.from(packageManager.values());
+  sendMessage({
+    messageType: 'parsePackageDetails',
+    data: packages,
+  });
   for (let i = 0; i < packages.length; i++) {
     const pkg = packages[i];
     pkgElementRatio[pkg.detailUrl] = 0;
   }
-  getRepos(packages.slice(0, 7));
+  // getRepos(packages.slice(0, 7));
 }
 
 main();
+
+chrome.runtime.onMessage.addListener(function(event) {
+  if (event.messageType === 'updateRepoUrl') {
+    event.data.forEach(function(item) {
+      const pkg = packageManager.get(item.detailUrl);
+      pkg.repoUrl = item.repoUrl;
+      const options = {
+        getGithubData(repoUrl) {
+          return getGithubRepoData(repoUrl, pkg.el);
+        },
+      };
+      const repoComponent = new GithubRepository(options);
+      repoComponent.render(pkg.el, {
+        url: item.repoUrl,
+        starCount: '',
+        forkCount: '',
+      });
+    });
+  }
+});

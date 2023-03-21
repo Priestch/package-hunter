@@ -1,31 +1,19 @@
-import axios from 'axios';
+const http = {
+  async get(url, config = {}) {
+    const response = await fetch(url, { ...config });
+    if (response.ok) {
+      if (config.responseType === 'document') {
+        const docText = await response.text();
+        const parser = new DOMParser();
+        return {
+          data: parser.parseFromString(docText, 'text/html'),
+        };
+      }
 
-const http = axios.create({
-  timeout: 30 * 1e3,
-});
-
-axios.defaults.headers.common.Accept = 'application/json';
-
-http.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      // console.log(error.response.data);
-      // console.log(error.response.status);
-    } else if (error.request) {
-      // The request was made but no response was received
-      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-      // http.ClientRequest in node.js
-      // console.log(error.request);
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      // console.log('Error', error.message);
+      return response;
     }
-    // console.log(error.config);
-    return Promise.reject(error);
+    throw new Error(response.statusText);
   },
-);
+};
 
 export default http;

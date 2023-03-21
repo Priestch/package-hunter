@@ -22,10 +22,6 @@
     "parcel": "^2.8.2",
     "prettier": "^1.15.3"
   },
-  "dependencies": {
-    "axios": "^0.18.0",
-    "redaxios": "^0.5.1"
-  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"

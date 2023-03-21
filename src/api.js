@@ -9,16 +9,14 @@ function parseRepoURL(repoURL) {
   };
 }
 
-async function getGithubRepo(repoPath) {
-  const { owner, repoName } = parseRepoURL(repoPath);
-  const repoURL = `https://github.com/${owner}/${repoName}`;
+async function getGithubRepo(repoUrl) {
   const config = {
     responseType: 'document',
     headers: {
       Accept: 'text/html',
     },
   };
-  const response = await http.get(repoURL, config);
+  const response = await http.get(repoUrl, config);
 
   const loadedHTML = response.data;
   const forkEl = loadedHTML.getElementById('repo-network-counter');
@@ -26,13 +24,25 @@ async function getGithubRepo(repoPath) {
 
   return {
     forkCount: forkEl.textContent,
-    stargazers: {
-      totalCount: starEl.textContent,
-    },
+    starCount: starEl.textContent,
+  };
+}
+
+async function getGithubDataByPath(repoPath) {
+  const { owner, repoName } = parseRepoURL(repoPath);
+  const repoURL = `https://github.com/${owner}/${repoName}`;
+  const data = await getGithubRepo(repoURL);
+
+  return {
     url: repoURL,
+    forkCount: data.forkCount,
+    stargazers: {
+      totalCount: data.starCount,
+    },
   };
 }
 
 export default {
   getGithubRepo,
+  getGithubDataByPath,
 };

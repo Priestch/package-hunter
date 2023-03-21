@@ -6,11 +6,15 @@
   display: block;
   position: absolute;
   top: 0;
-  right: -60px;
+  right: -65px;
   margin: 0;
-  width: 60px;
+  min-width: 65px;
   height: 100%;
   background: #d3d3d3;
+}
+
+a.gh-repo-anchor::after {
+  display: none;
 }
 
 .gh-repo-anchor:hover,

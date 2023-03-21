@@ -2,7 +2,6 @@ lockfileVersion: 5.4
 
 specifiers:
   '@parcel/config-webextension': ^2.8.2
-  axios: ^0.18.0
   eslint: ^5.9.0
   eslint-config-airbnb-base: ^13.1.0
   eslint-config-prettier: ^3.3.0
@@ -12,11 +11,6 @@ specifiers:
   lint-staged: ^8.1.0
   parcel: ^2.8.2
   prettier: ^1.15.3
-  redaxios: ^0.5.1
-
-dependencies:
-  axios: 0.18.1
-  redaxios: 0.5.1
 
 devDependencies:
   '@parcel/config-webextension': 2.8.2
@@ -1289,15 +1283,6 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /axios/0.18.1:
-    resolution: {integrity: sha1-/z8N4ue10YDnV62YAA8Qgbh7zqM=}
-    dependencies:
-      follow-redirects: 1.5.10
-      is-buffer: 2.0.5
-    transitivePeerDependencies:
-      - supports-color
-    dev: false
-
   /balanced-match/1.0.2:
     resolution: {integrity: sha1-6D46fj8wCzTLnYf2FfoMvzV2kO4=}
     dev: true
@@ -1638,17 +1623,6 @@ packages:
     dependencies:
       ms: 2.0.0
     dev: true
-
-  /debug/3.1.0:
-    resolution: {integrity: sha1-W7WgZyYotkFJVmuhaBnmFRjGcmE=}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
-    dependencies:
-      ms: 2.0.0
-    dev: false
 
   /debug/3.2.7:
     resolution: {integrity: sha1-clgLfpFF+zm2Z2+cXl+xALk0F5o=}
@@ -2255,15 +2229,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /follow-redirects/1.5.10:
-    resolution: {integrity: sha1-e3qfmuov3/NnhqlP9kPtB/T/Xio=}
-    engines: {node: '>=4.0'}
-    dependencies:
-      debug: 3.1.0
-    transitivePeerDependencies:
-      - supports-color
-    dev: false
-
   /for-each/0.3.3:
     resolution: {integrity: sha1-abRH6IoKXTLD5whPPxcQA0shN24=}
     dependencies:
@@ -2676,11 +2641,6 @@ packages:
   /is-buffer/1.1.6:
     resolution: {integrity: sha1-76ouqdqg16suoTqXsritUf776L4=}
     dev: true
-
-  /is-buffer/2.0.5:
-    resolution: {integrity: sha1-68JS5ADSL/jXf6CYiIIaJKZYwZE=}
-    engines: {node: '>=4'}
-    dev: false
 
   /is-callable/1.2.7:
     resolution: {integrity: sha512-1BC0BVFhS/p0qtw6enp8e+8OD0UrK0oFLztSjNzhcKA3WDuJxxAPXzPuPtKkjEY9UUoEWlX/8fgKeu2S8i9JTA==}
@@ -3316,6 +3276,7 @@ packages:
 
   /ms/2.0.0:
     resolution: {integrity: sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=}
+    dev: true
 
   /ms/2.1.2:
     resolution: {integrity: sha1-0J0fNXtEP0kzgqjrPM0YOHKuYAk=}
@@ -3810,10 +3771,6 @@ packages:
       parse-json: 4.0.0
       pify: 3.0.0
     dev: true
-
-  /redaxios/0.5.1:
-    resolution: {integrity: sha512-FSD2AmfdbkYwl7KDExYQlVvIrFz6Yd83pGfaGjBzM9F6rpq8g652Q4Yq5QD4c+nf4g2AgeElv1y+8ajUPiOYMg==}
-    dev: false
 
   /regenerator-runtime/0.13.11:
     resolution: {integrity: sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==}
