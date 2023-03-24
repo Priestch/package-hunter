@@ -2,6 +2,8 @@ lockfileVersion: 5.4
 
 specifiers:
   '@parcel/config-webextension': ^2.8.2
+  '@parcel/optimizer-data-url': 2.8.2
+  '@parcel/transformer-inline-string': 2.8.2
   eslint: ^5.9.0
   eslint-config-airbnb-base: ^13.1.0
   eslint-config-prettier: ^3.3.0
@@ -14,6 +16,8 @@ specifiers:
 
 devDependencies:
   '@parcel/config-webextension': 2.8.2
+  '@parcel/optimizer-data-url': 2.8.2
+  '@parcel/transformer-inline-string': 2.8.2
   eslint: 5.16.0
   eslint-config-airbnb-base: 13.2.0_kmhlp56kqn5xqewve257p4rsse
   eslint-config-prettier: 3.6.0_eslint@5.16.0
@@ -515,6 +519,18 @@ packages:
       - '@parcel/core'
     dev: true
 
+  /@parcel/optimizer-data-url/2.8.2:
+    resolution: {integrity: sha512-wFkwIOjh/kWwl9aQkhcNHH3VrGujW8AYQx8DFkcNaUaR6SPMRNXUZ3zLfDsHLvlRRL8YqYAvrGerQ0M5auChIQ==}
+    engines: {node: '>= 12.0.0', parcel: ^2.8.2}
+    dependencies:
+      '@parcel/plugin': 2.8.2
+      '@parcel/utils': 2.8.2
+      isbinaryfile: 4.0.10
+      mime: 2.6.0
+    transitivePeerDependencies:
+      - '@parcel/core'
+    dev: true
+
   /@parcel/optimizer-htmlnano/2.8.2:
     resolution: {integrity: sha512-4+3wi+Yi+hsf5/LolX59JXFe/7bLpI6NetUBgtoxOVm/EzFg1NGSNOcrthzEcgGj6+MMSdzBAxRTPObAfDxJCA==}
     engines: {node: '>= 12.0.0', parcel: ^2.8.2}
@@ -862,6 +878,15 @@ packages:
       '@parcel/utils': 2.8.2
       '@parcel/workers': 2.8.2_@parcel+core@2.8.2
       nullthrows: 1.1.1
+    dev: true
+
+  /@parcel/transformer-inline-string/2.8.2:
+    resolution: {integrity: sha512-140SRnwKktVJB/McYlN0ub4NpdXECu0NesVf3ORPaG1WLF/ZxYVpLl60XBptoze9ezUqR6B6Z34fWXZiOcW09Q==}
+    engines: {node: '>= 12.0.0', parcel: ^2.8.2}
+    dependencies:
+      '@parcel/plugin': 2.8.2
+    transitivePeerDependencies:
+      - '@parcel/core'
     dev: true
 
   /@parcel/transformer-js/2.8.2:
@@ -2874,6 +2899,11 @@ packages:
     resolution: {integrity: sha1-u5NdSFgsuhaMBoNJV6VKPgcSTxE=}
     dev: true
 
+  /isbinaryfile/4.0.10:
+    resolution: {integrity: sha512-iHrqe5shvBUcFbmZq9zOQHBoeOhZJu6RQGrDpBgenUm/Am+F3JM2MgQj+rK3Z601fzrL5gLZWtAPH2OBaSVcyw==}
+    engines: {node: '>= 8.0.0'}
+    dev: true
+
   /isexe/2.0.0:
     resolution: {integrity: sha1-6PvzdNxVb/iUehDcsFctYz8s+hA=}
     dev: true
@@ -3242,6 +3272,12 @@ packages:
     dependencies:
       braces: 3.0.2
       picomatch: 2.3.1
+    dev: true
+
+  /mime/2.6.0:
+    resolution: {integrity: sha1-oqaCqVzU0MsdYlfij4PafjWAA2c=}
+    engines: {node: '>=4.0.0'}
+    hasBin: true
     dev: true
 
   /mimic-fn/1.2.0:

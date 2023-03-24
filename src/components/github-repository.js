@@ -1,3 +1,8 @@
+// eslint-disable-next-line import/no-unresolved
+import starSvg from 'bundle-text:../assets/icons/star.svg';
+// eslint-disable-next-line import/no-unresolved
+import forkSvg from 'bundle-text:../assets/icons/fork.svg';
+
 export default class GithubRepository {
   constructor(options) {
     this.options = options;
@@ -14,11 +19,12 @@ export default class GithubRepository {
     return icon;
   }
 
-  static createListItem(text, iconClasses) {
+  static createListItem(text, iconClasses, svg) {
     const itemEle = document.createElement('li');
     itemEle.classList.add('gh-item');
     const iconEl = GithubRepository.createIcon(iconClasses);
     itemEle.appendChild(iconEl);
+    iconEl.innerHTML = svg;
     const textEl = document.createElement('span');
     textEl.classList.add('gh-item-content');
     textEl.textContent = text;
@@ -29,15 +35,17 @@ export default class GithubRepository {
   createListElement() {
     const itemList = document.createElement('ul');
     itemList.classList.add('gh-repo-card');
-    const starItem = GithubRepository.createListItem(this.repoData.starCount, [
-      'fa',
-      'fa-star',
-    ]);
+    const starItem = GithubRepository.createListItem(
+      this.repoData.starCount,
+      ['icon', 'icon-star'],
+      starSvg,
+    );
     starItem.classList.add('gh-star-item');
-    const forkItem = GithubRepository.createListItem(this.repoData.forkCount, [
-      'fa',
-      'fa-code-branch',
-    ]);
+    const forkItem = GithubRepository.createListItem(
+      this.repoData.forkCount,
+      ['icon', 'icon-fork'],
+      forkSvg,
+    );
     forkItem.classList.add('gh-fork-item');
     itemList.appendChild(starItem);
     itemList.appendChild(forkItem);

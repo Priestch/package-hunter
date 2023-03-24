@@ -32,6 +32,9 @@ a.gh-repo-anchor::after {
   flex-direction: column;
   justify-content: space-around;
   align-items: stretch;
+
+  /* crate override */
+  padding-inline-start: 0;
 }
 
 .gh-repo-card .gh-item {
@@ -42,6 +45,12 @@ a.gh-repo-anchor::after {
   width: 100%;
 }
 
-.gh-repo-card .gh-item .fa {
+.gh-repo-card .gh-item .icon {
   margin-right: 5px;
+}
+
+.gh-repo-card .gh-item .icon svg {
+  width: 20px;
+  height: 20px;
+  color: #333333;
 }

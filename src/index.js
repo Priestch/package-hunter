@@ -7,8 +7,9 @@ const RepoTaskStatus = {
   RESOLVED: 1,
 };
 
-function findPagePackages() {
-  return document.querySelector('#content .left-layout__main ul.unstyled');
+function sendMessage(message, callback) {
+  // console.log('sendMessage', message);
+  chrome.runtime.sendMessage(message, callback);
 }
 
 /**
@@ -18,6 +19,24 @@ function findPagePackages() {
 function getPackageURL(pkgElement) {
   const anchorElement = pkgElement.querySelector('.package-snippet');
   return anchorElement.getAttribute('href');
+}
+
+async function getGithubRepoData(repoUrl, el) {
+  return new Promise(resolve => {
+    if (el.dataset.repoStatus) {
+      resolve();
+      return;
+    }
+    /* eslint-disable no-param-reassign */
+    el.dataset.repoStatus = RepoTaskStatus.PENDING;
+    const message = {
+      messageType: 'getGithubRepoData',
+      data: repoUrl,
+    };
+    sendMessage(message, function(data) {
+      resolve(data);
+    });
+  });
 }
 
 /**
@@ -60,24 +79,114 @@ class Package {
   }
 }
 
-const packageManager = new Map();
-
-/**
- * @return {Package[]}
- */
-function collectPagePackages() {
-  packageManager.clear();
-  const pkgListElement = findPagePackages();
-  for (let i = 0; i < pkgListElement.children.length; i++) {
-    const child = pkgListElement.children[i];
-    const pkg = Package.fromDOM(child);
-    packageManager.set(pkg.name, pkg);
+class Provider {
+  /**
+   * @param {string} cssSelector
+   */
+  constructor(cssSelector) {
+    this.cssSelector = cssSelector;
+    this.pkgs = new Map();
   }
 }
 
-function sendMessage(message, callback) {
-  // console.log('sendMessage', message);
-  chrome.runtime.sendMessage(message, callback);
+class PypiProvider extends Provider {
+  constructor(props) {
+    super(props);
+    this.collectPagePackages();
+    this.trigger();
+  }
+
+  /**
+   * @return {Package[]}
+   */
+  collectPagePackages() {
+    this.pkgs.clear();
+    const pkgElements = document.querySelector(this.cssSelector);
+    for (let i = 0; i < pkgElements.children.length; i++) {
+      const child = pkgElements.children[i];
+      const pkg = Package.fromDOM(child);
+      this.pkgs.set(pkg.name, pkg);
+    }
+  }
+
+  trigger() {
+    const packages = Array.from(this.pkgs.values());
+    sendMessage({
+      messageType: 'parsePackageDetails',
+      data: packages,
+    });
+    for (let i = 0; i < packages.length; i++) {
+      const pkg = packages[i];
+      pkgElementRatio[pkg.detailUrl] = 0;
+    }
+  }
+}
+
+class CrateProvider extends Provider {
+  constructor(props) {
+    super(props);
+    this.trigger();
+  }
+
+  trigger() {
+    this.createObserver();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  createObserver() {
+    const config = { childList: true, subtree: true };
+
+    const callback = mutationList => {
+      mutationList.forEach(mutation => {
+        const { length } = mutation.addedNodes;
+        if (length === 0 || length !== 1) {
+          return;
+        }
+        const node = mutation.addedNodes[0];
+        if (node.tagName === 'LI') {
+          const crateEl = node.querySelector('[class^=_crate-row_]');
+          if (crateEl) {
+            const detailAnchor = crateEl.querySelector('a[class^="_name_"]');
+            const quickLinkEls = crateEl.querySelectorAll(
+              'ul[class^="_quick-links_"] a',
+            );
+            let githubUrl;
+            quickLinkEls.forEach(function(el) {
+              const { href } = el;
+              if (
+                el.textContent.trim() === 'Repository' &&
+                href.startsWith('https://github.com')
+              ) {
+                githubUrl = href.replace(/\.git$/, '');
+              }
+            });
+            const detailUrl = detailAnchor.getAttribute('href');
+            const pkg = new Package(detailUrl, { detailUrl, el: crateEl });
+            pkg.repoUrl = githubUrl;
+            this.pkgs.set(pkg.name, pkg);
+            const options = {
+              getGithubData(repoUrl) {
+                console.log('getGithubData', repoUrl);
+                return getGithubRepoData(repoUrl, pkg.el);
+              },
+            };
+            pkg.el.style.position = 'relative';
+            if (pkg.repoUrl) {
+              const repoComponent = new GithubRepository(options);
+              repoComponent.render(pkg.el, {
+                url: pkg.repoUrl,
+                starCount: '',
+                forkCount: '',
+              });
+            }
+          }
+        }
+      });
+    };
+
+    const observer = new MutationObserver(callback);
+    observer.observe(document.body, config);
+  }
 }
 
 function convertRepoData(repoData) {
@@ -139,24 +248,6 @@ function getRepoData({ detailUrl, el }) {
   });
 }
 
-async function getGithubRepoData(repoUrl, el) {
-  return new Promise(resolve => {
-    if (el.dataset.repoStatus) {
-      resolve();
-      return;
-    }
-    /* eslint-disable no-param-reassign */
-    el.dataset.repoStatus = RepoTaskStatus.PENDING;
-    const message = {
-      messageType: 'getGithubRepoData',
-      data: repoUrl,
-    };
-    sendMessage(message, function(data) {
-      resolve(data);
-    });
-  });
-}
-
 function getRepoDataByStep(start, step, packages) {
   const stepPromises = [];
   const stepPackages = packages.slice(start, start + step);
@@ -200,19 +291,20 @@ function observeRepoElement() {
   }
 }
 
+let provider;
+
+function createProvider() {
+  if (location.host === 'pypi.org') {
+    return new PypiProvider('#content .left-layout__main ul.unstyled')
+  } else if (location.host === 'crates.io') {
+    return new CrateProvider('[class^=_crate-row_]')
+  }
+}
+
 async function main() {
   // observeRepoElement();
 
-  collectPagePackages();
-  const packages = Array.from(packageManager.values());
-  sendMessage({
-    messageType: 'parsePackageDetails',
-    data: packages,
-  });
-  for (let i = 0; i < packages.length; i++) {
-    const pkg = packages[i];
-    pkgElementRatio[pkg.detailUrl] = 0;
-  }
+  provider = createProvider();
   // getRepos(packages.slice(0, 7));
 }
 
@@ -221,7 +313,7 @@ main();
 chrome.runtime.onMessage.addListener(function(event) {
   if (event.messageType === 'updateRepoUrl') {
     event.data.forEach(function(item) {
-      const pkg = packageManager.get(item.detailUrl);
+      const pkg = provider.pkgs.get(item.detailUrl);
       pkg.repoUrl = item.repoUrl;
       const options = {
         getGithubData(repoUrl) {
