@@ -52,6 +52,21 @@ export default class GithubRepository {
     return itemList;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  setContext(dom) {
+    const { hostname } = window.location;
+    const classList = [];
+    const size = '16px';
+    if (hostname === 'crates.io') {
+      classList.push('crate');
+    } else if (hostname === 'pypi.org') {
+      classList.push('pypi');
+    }
+
+    dom.classList.add(...classList);
+    dom.style.setProperty('--size', size);
+  }
+
   createComponent() {
     const component = document.createElement('a');
     component.classList.add('gh-repo-anchor');
@@ -87,6 +102,7 @@ export default class GithubRepository {
     if (repoData !== null) {
       this.repoData = repoData;
       this.el = this.createComponent();
+      this.setContext(this.el);
       this.el.component$ = this;
       container.appendChild(this.el);
     }
