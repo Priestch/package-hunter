@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Package Hunter",
-  "description": "Make you easy when you search package on pypi",
+  "description": "A browser extension to help programmer find different programming language packages effectively.",
   "version": "1.2.0",
   "content_scripts": [
     {
