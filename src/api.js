@@ -16,16 +16,21 @@ async function getGithubRepo(repoUrl) {
       Accept: 'text/html',
     },
   };
-  const response = await http.get(repoUrl, config);
+  try {
+    const response = await http.get(repoUrl, config);
+    const loadedHTML = response.data;
+    const forkEl = loadedHTML.getElementById('repo-network-counter');
+    const starEl = loadedHTML.getElementById('repo-stars-counter-unstar');
 
-  const loadedHTML = response.data;
-  const forkEl = loadedHTML.getElementById('repo-network-counter');
-  const starEl = loadedHTML.getElementById('repo-stars-counter-unstar');
-
-  return {
-    forkCount: forkEl.textContent,
-    starCount: starEl.textContent,
-  };
+    return {
+      forkCount: forkEl.textContent,
+      starCount: starEl.textContent,
+    };
+  } catch (e) {
+    return {
+      error: true,
+    };
+  }
 }
 
 async function getGithubDataByPath(repoPath) {

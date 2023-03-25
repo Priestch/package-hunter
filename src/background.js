@@ -38,8 +38,11 @@ async function getBatchPackageDetails(start, batchSize, packages) {
           const repoPathname = await parseRepoURL(
             `${PACKAGE_HOST}${pkg.detailUrl}`,
           );
+          const repoUrl = repoPathname
+            ? `https://github.com${repoPathname}`
+            : null;
           resolve({
-            repoUrl: `https://github.com${repoPathname}`,
+            repoUrl,
             detailUrl: pkg.detailUrl,
           });
         } catch (e) {

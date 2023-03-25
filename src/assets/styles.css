@@ -13,6 +13,14 @@
   background: #d3d3d3;
 }
 
+.gh-repo-anchor.error {
+  border: 1px solid red;
+}
+
+.gh-repo-anchor.loading {
+  cursor: wait;
+}
+
 a.gh-repo-anchor::after {
   display: none;
 }

@@ -67,9 +67,14 @@ export default class GithubRepository {
     dom.style.setProperty('--size', size);
   }
 
+  setInvalidStatus() {
+    this.el.classList.add('error');
+    this.el.setAttribute('title', 'Cannot fetch Github repository data.');
+  }
+
   createComponent() {
     const component = document.createElement('a');
-    component.classList.add('gh-repo-anchor');
+    component.classList.add('gh-repo-anchor', 'loading');
     component.setAttribute('href', this.repoData.url);
     component.setAttribute('target', '_blank');
     const listElement = this.createListElement();
@@ -77,9 +82,16 @@ export default class GithubRepository {
 
     component.addEventListener('mouseover', async () => {
       const data = await this.options.getGithubData(this.repoData.url);
-      if (data) {
-        this.update(data);
+      if (!data) {
+        return;
       }
+      if (!data.error) {
+        this.update(data);
+      } else {
+        this.setInvalidStatus();
+      }
+
+      this.el.classList.remove('loading');
     });
 
     return component;

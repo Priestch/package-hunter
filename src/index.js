@@ -313,6 +313,10 @@ main();
 chrome.runtime.onMessage.addListener(function(event) {
   if (event.messageType === 'updateRepoUrl') {
     event.data.forEach(function(item) {
+      if (!item.repoUrl) {
+        return;
+      }
+
       const pkg = provider.pkgs.get(item.detailUrl);
       pkg.repoUrl = item.repoUrl;
       const options = {
