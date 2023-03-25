@@ -6,7 +6,8 @@ A browser extension to help programmer find different programming language packa
 - [x] [crates.io](https://crates.io/)
 - [ ] [npmjs](https://www.npmjs.com/)
 
-# [Plugin URL](https://chrome.google.com/webstore/detail/package-hunter/fkbbiniadlppgncanioiajphnlbickni)
 ## Screenshots
 ![pypi.org](./src/screenshots/pypi.png)
 ![crates.io](./src/screenshots/crates.png)
+
+# [Install From Chrome Web Store](https://chrome.google.com/webstore/detail/package-hunter/fkbbiniadlppgncanioiajphnlbickni)
