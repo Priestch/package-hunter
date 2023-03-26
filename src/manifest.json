@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Package Hunter",
   "description": "A browser extension to help programmer find different programming language packages effectively.",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "content_scripts": [
     {
       "matches": ["*://pypi.org/search/?*", "*://crates.io/search*", "*://www.npmjs.com/*"],
