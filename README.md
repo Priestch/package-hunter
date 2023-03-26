@@ -9,5 +9,6 @@ A browser extension to help programmer find different programming language packa
 ## Screenshots
 ![pypi.org](./src/screenshots/pypi.png)
 ![crates.io](./src/screenshots/crates.png)
+![npmjs.com](./src/screenshots/npmjs.png)
 
 # [Install From Chrome Web Store](https://chrome.google.com/webstore/detail/package-hunter/fkbbiniadlppgncanioiajphnlbickni)
