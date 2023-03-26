@@ -6,9 +6,9 @@
   display: block;
   position: absolute;
   top: 0;
-  right: -65px;
+  right: -5em;
   margin: 0;
-  min-width: 65px;
+  min-width: 5em;
   height: 100%;
   background: #d3d3d3;
 }
