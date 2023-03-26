@@ -5,7 +5,7 @@
   "version": "1.2.1",
   "content_scripts": [
     {
-      "matches": ["*://pypi.org/search/?*", "*://crates.io/search*"],
+      "matches": ["*://pypi.org/search/?*", "*://crates.io/search*", "*://www.npmjs.com/*"],
       "css": ["assets/styles.css"],
       "js": ["index.js"]
     }
