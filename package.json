@@ -9,7 +9,7 @@
     "prebuild": "rm -rf dist",
     "postbuild": "zip -rjq package-hunter.zip dist",
     "start": "parcel watch src/manifest.json --host localhost",
-    "build": "parcel build src/manifest.json",
+    "build": "parcel build src/manifest.json --no-content-hash",
     "release": "yarn run build && bash ./bin/release.sh"
   },
   "devDependencies": {
