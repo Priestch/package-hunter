@@ -1,5 +1,5 @@
 # Package Hunter
-A browser extension to help programmer find different programming language packages effectively.
+A browser extension to help programmers find different programming language packages more effectively by adding Github star and fork count to search results.
 
 # [Add to Chrome](https://chrome.google.com/webstore/detail/package-hunter/fkbbiniadlppgncanioiajphnlbickni)
 
