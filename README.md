@@ -1,6 +1,8 @@
 # Package Hunter
 A browser extension to help programmer find different programming language packages effectively.
 
+# [Add to Chrome](https://chrome.google.com/webstore/detail/package-hunter/fkbbiniadlppgncanioiajphnlbickni)
+
 # Supported Packages Host
 - [x] [pypi](https://pypi.org/)
 - [x] [crates.io](https://crates.io/)
@@ -16,5 +18,3 @@ A browser extension to help programmer find different programming language packa
 #### Javascript Npm
 ![npmjs.com](./src/screenshots/npmjs.png)
 
-
-# [Install From Chrome Web Store](https://chrome.google.com/webstore/detail/package-hunter/fkbbiniadlppgncanioiajphnlbickni)
