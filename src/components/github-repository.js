@@ -61,6 +61,10 @@ export default class GithubRepository {
       classList.push('crate');
     } else if (hostname === 'pypi.org') {
       classList.push('pypi');
+    } else if (hostname === 'pub.dev') {
+      classList.push('pub');
+    } else if (hostname === 'www.npmjs.com') {
+      classList.push('npmjs');
     }
 
     dom.classList.add(...classList);

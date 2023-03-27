@@ -4,13 +4,22 @@
 
 .gh-repo-anchor {
   display: block;
+  color: #383838 !important;
   position: absolute;
   top: 0;
   right: -5em;
   margin: 0;
   min-width: 5em;
   height: 100%;
-  background: #d3d3d3;
+  border-top-right-radius: clamp(0.25rem, calc(0.23rem + 0.12vw), 0.31rem);
+  border-bottom-right-radius: clamp(0.25rem, calc(0.23rem + 0.12vw), 0.31rem);
+  background: #edebdd;
+}
+
+.gh-repo-anchor:hover,
+.gh-repo-anchor:focus {
+  text-decoration: none;
+  background: #edebdd;
 }
 
 .gh-repo-anchor.error {
@@ -23,12 +32,6 @@
 
 a.gh-repo-anchor::after {
   display: none;
-}
-
-.gh-repo-anchor:hover,
-.gh-repo-anchor:focus {
-  text-decoration: none;
-  background: #d3d3d3;
 }
 
 .gh-repo-card {
