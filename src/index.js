@@ -1,7 +1,5 @@
 import GithubRepository from './components/github-repository';
 
-const pkgElementRatio = {};
-
 const RepoTaskStatus = {
   PENDING: 0,
   RESOLVED: 1,
@@ -115,10 +113,39 @@ class PypiProvider extends Provider {
       messageType: 'parsePackageDetails',
       data: packages,
     });
-    for (let i = 0; i < packages.length; i++) {
-      const pkg = packages[i];
-      pkgElementRatio[pkg.detailUrl] = 0;
+  }
+}
+
+class PubProvider extends Provider {
+  constructor(props) {
+    super(props);
+    this.collectPagePackages();
+    this.trigger();
+  }
+
+  /**
+   * @return {Package[]}
+   */
+  collectPagePackages() {
+    this.pkgs.clear();
+    const pkgElements = document.querySelectorAll(this.cssSelector);
+    for (let i = 0; i < pkgElements.length; i++) {
+      const child = pkgElements[i];
+      const titleAnchor = child.querySelector('.packages-title a');
+      const detailUrl = titleAnchor.getAttribute('href');
+      if (detailUrl.startsWith('/')) {
+        const pkg = new Package(detailUrl, { el: child, detailUrl });
+        this.pkgs.set(pkg.name, pkg);
+      }
     }
+  }
+
+  trigger() {
+    const packages = Array.from(this.pkgs.values());
+    sendMessage({
+      messageType: 'parsePubPackageDetails',
+      data: packages,
+    });
   }
 }
 
@@ -425,6 +452,8 @@ function createProvider() {
     return new CrateProvider('[class^=_crate-row_]')
   } else if (location.hostname === 'www.npmjs.com') {
     return new NpmProvider('')
+  } else if (location.hostname === 'pub.dev') {
+    return new PubProvider('.packages-item')
   }
 }
 
@@ -446,6 +475,7 @@ chrome.runtime.onMessage.addListener(function(event) {
 
       const pkg = provider.pkgs.get(item.detailUrl);
       pkg.repoUrl = item.repoUrl;
+      pkg.el.style.position = 'relative';
       const options = {
         getGithubData(repoUrl) {
           return getGithubRepoData(repoUrl, pkg.el);
