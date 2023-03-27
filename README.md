@@ -7,6 +7,7 @@ A browser extension to help programmers find different programming language pack
 - [x] [pypi](https://pypi.org/)
 - [x] [crates.io](https://crates.io/)
 - [x] [npmjs](https://www.npmjs.com/)
+- [x] [pub.dev](https://pub.dev/)
 
 ## Screenshots
 #### Python Pypi
@@ -17,4 +18,7 @@ A browser extension to help programmers find different programming language pack
 
 #### Javascript Npm
 ![npmjs.com](./src/screenshots/npmjs.png)
+
+#### Dart Pub
+![pub.dev](./src/screenshots/pub.png)
 
