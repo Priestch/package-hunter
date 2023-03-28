@@ -1,4 +1,20 @@
-.left-layout__main .unstyled > li {
+.gems__gem.github {
+  width: calc(100% - 5em);
+}
+
+.gems__gem.github .gems__gem__downloads__count {
+  margin-right: 1em;
+}
+
+.gems__gem.github .gems__gem__info {
+  width: 75%;
+}
+
+.gems__gem.github .gh-repo-anchor {
+  border-bottom: 1px solid #c1c4ca;
+}
+
+.l-wrap--b {
   position: relative;
 }
 

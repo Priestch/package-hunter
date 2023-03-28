@@ -149,6 +149,36 @@ class PubProvider extends Provider {
   }
 }
 
+class GemProvider extends Provider {
+  constructor(props) {
+    super(props);
+    this.collectPagePackages();
+    this.trigger();
+  }
+
+  /**
+   * @return {Package[]}
+   */
+  collectPagePackages() {
+    this.pkgs.clear();
+    const pkgElements = document.querySelectorAll(this.cssSelector);
+    for (let i = 0; i < pkgElements.length; i++) {
+      const child = pkgElements[i];
+      const detailUrl = child.getAttribute('href');
+      const pkg = new Package(detailUrl, { el: child, detailUrl });
+      this.pkgs.set(pkg.name, pkg);
+    }
+  }
+
+  trigger() {
+    const packages = Array.from(this.pkgs.values());
+    sendMessage({
+      messageType: 'parseGemPackageDetails',
+      data: packages,
+    });
+  }
+}
+
 class CrateProvider extends Provider {
   constructor(props) {
     super(props);
@@ -341,120 +371,26 @@ class NpmProvider extends Provider {
   }
 }
 
-function convertRepoData(repoData) {
-  const {
-    forkCount,
-    stargazers: { totalCount },
-    url,
-  } = repoData;
-  return {
-    forkCount,
-    starCount: totalCount,
-    url,
-  };
-}
-
-function renderRepoData(pkgURL, domContainer, resolve) {
-  return rawRepoData => {
-    if (rawRepoData === null) {
-      console.error('renderRepoData', pkgURL, rawRepoData);
-      return;
-    }
-    let repoData;
-    try {
-      repoData = convertRepoData(rawRepoData);
-    } catch (e) {
-      console.log(
-        'Error happened when fetching Repo data',
-        pkgURL,
-        rawRepoData,
-      );
-      console.error(e);
-    }
-    if (!(repoData instanceof Error)) {
-      const repoComponent = new GithubRepository();
-      repoComponent.render(domContainer, repoData);
-      /* eslint-disable no-param-reassign */
-      domContainer.dataset.repoStatus = RepoTaskStatus.RESOLVED;
-      console.log(pkgURL, domContainer.dataset.repoStatus);
-    }
-    resolve(repoData);
-  };
-}
-
-function getRepoData({ detailUrl, el }) {
-  console.log('getRepoData', detailUrl);
-  return new Promise(resolve => {
-    if (el.dataset.repoStatus) {
-      resolve();
-      return;
-    }
-    /* eslint-disable no-param-reassign */
-    el.dataset.repoStatus = RepoTaskStatus.PENDING;
-    console.log(detailUrl, el.dataset.repoStatus);
-    const message = {
-      messageType: 'getRepoData',
-      data: detailUrl,
-    };
-    sendMessage(message, renderRepoData(detailUrl, el, resolve));
-  });
-}
-
-function getRepoDataByStep(start, step, packages) {
-  const stepPromises = [];
-  const stepPackages = packages.slice(start, start + step);
-  for (let j = 0; j < step; j++) {
-    stepPromises.push(getRepoData(stepPackages[j]));
-  }
-  return Promise.all(stepPromises);
-}
-
-/* eslint-disable */
-async function getRepos(packages, step = 2) {
-  for (let i = 0; i < packages.length; i += step) {
-    await getRepoDataByStep(i, step, packages);
-  }
-}
-
-function pkgEnterViewportCallback(entries) {
-  const entry = entries[0];
-  const pkgURL = getPackageURL(entry.target);
-  const prevRatio = pkgElementRatio[pkgURL];
-  if (entry.intersectionRatio > prevRatio && entry.intersectionRatio > 0.95) {
-    const pkgData = { detailUrl: pkgURL, el: entry.target };
-    getRepoData(pkgData);
-  }
-  pkgElementRatio[pkgURL] = entry.intersectionRatio;
-}
-
-// eslint-disable-next-line no-unused-vars
-function observeRepoElement() {
-  const options = {
-    root: null,
-    rootMargin: '0px',
-    threshold: [0.8, 1],
-  };
-
-  const observer = new IntersectionObserver(pkgEnterViewportCallback, options);
-  const pkgEls = document.querySelectorAll('.left-layout__main .unstyled > li');
-  for (let i = 0; i < pkgEls.length; i++) {
-    const pkgEl = pkgEls[i];
-    observer.observe(pkgEl);
-  }
-}
-
 let provider;
 
 function createProvider() {
-  if (location.hostname === 'pypi.org') {
-    return new PypiProvider('#content .left-layout__main ul.unstyled')
-  } else if (location.hostname === 'crates.io') {
-    return new CrateProvider('[class^=_crate-row_]')
-  } else if (location.hostname === 'www.npmjs.com') {
-    return new NpmProvider('')
-  } else if (location.hostname === 'pub.dev') {
-    return new PubProvider('.packages-item')
+  if (window.location.hostname === 'pypi.org') {
+    return new PypiProvider('#content .left-layout__main ul.unstyled');
   }
+  if (window.location.hostname === 'crates.io') {
+    return new CrateProvider('[class^=_crate-row_]');
+  }
+  if (window.location.hostname === 'www.npmjs.com') {
+    return new NpmProvider('');
+  }
+  if (window.location.hostname === 'pub.dev') {
+    return new PubProvider('.packages-item');
+  }
+  if (window.location.hostname === 'rubygems.org') {
+    return new GemProvider('.gems__gem');
+  }
+
+  return null;
 }
 
 async function main() {
@@ -475,7 +411,9 @@ chrome.runtime.onMessage.addListener(function(event) {
 
       const pkg = provider.pkgs.get(item.detailUrl);
       pkg.repoUrl = item.repoUrl;
-      pkg.el.style.position = 'relative';
+      if (window.location.hostname !== 'rubygems.org') {
+        pkg.el.style.position = 'relative';
+      }
       const options = {
         getGithubData(repoUrl) {
           return getGithubRepoData(repoUrl, pkg.el);
@@ -487,6 +425,15 @@ chrome.runtime.onMessage.addListener(function(event) {
         starCount: '',
         forkCount: '',
       });
+      if (window.location.hostname === 'rubygems.org') {
+        pkg.el.classList.add('github');
+        repoComponent.el.style.setProperty('top', `${pkg.el.offsetTop}px`);
+        repoComponent.el.style.setProperty('right', '0px');
+        repoComponent.el.style.setProperty(
+          'height',
+          `${pkg.el.offsetHeight - 1}px`,
+        );
+      }
     });
   }
 });

@@ -1,143 +1,69 @@
 import http from './http';
 import api from './api';
 
-const PACKAGE_HOST = 'https://pypi.org';
+const PYTHON_PACKAGE_HOST = 'https://pypi.org';
 const PUB_PACKAGE_HOST = 'https://pub.dev/';
+const GEM_PACKAGE_HOST = 'https://rubygems.org/';
 
-async function parsePypiRepoURL(packageURL) {
-  const config = {
-    responseType: 'document',
-    headers: {
-      Accept: 'text/html',
-    },
-  };
-  const response = await http.get(packageURL, config);
-  const statsEl = response.data.querySelector(
-    '#content [data-controller="github-repo-stats"]',
-  );
-  if (statsEl === null) {
-    return null;
+class GithubParser {
+  constructor(packages, step = 5) {
+    this.packages = packages;
+    this.step = step;
+    this.parser = null;
   }
-  const statsUrlText = statsEl.dataset.githubRepoStatsUrlValue;
-  const statsUrl = new URL(statsUrlText);
-  return statsUrl.pathname.replace('/repos', '');
-}
 
-async function parsePubRepoURL(packageURL) {
-  const config = {
-    responseType: 'document',
-    headers: {
-      Accept: 'text/html',
-    },
-  };
-  const response = await http.get(packageURL, config);
-  const linkEl = response.data.querySelector('.detail-info-box .link');
-  const hrefAttr = linkEl.getAttribute('href');
-  if (linkEl === null || !hrefAttr.startsWith('https://github.com')) {
-    return null;
+  async run(parser, tab) {
+    this.parser = parser;
+    for (let i = 0; i < this.packages.length; i += this.step) {
+      const promises = [];
+      const stepPackages = this.packages.slice(i, i + this.step);
+      for (let j = 0; j < this.step; j++) {
+        const pkg = stepPackages[j];
+        promises.push(
+          new Promise(async (resolve, reject) => {
+            try {
+              const repoPathname = await this.parseRepoUrl(
+                `${parser.host}${pkg.detailUrl}`,
+              );
+              const repoUrl = repoPathname
+                ? `https://github.com${repoPathname}`
+                : null;
+              resolve({
+                repoUrl,
+                detailUrl: pkg.detailUrl,
+              });
+            } catch (e) {
+              reject(e);
+            }
+          }),
+        );
+      }
+      // eslint-disable-next-line no-await-in-loop
+      const results = await Promise.all(promises);
+
+      chrome.tabs.sendMessage(tab.id, {
+        messageType: 'updateRepoUrl',
+        data: results,
+      });
+    }
   }
-  const statsUrl = new URL(hrefAttr);
-  return statsUrl.pathname;
-}
 
-async function fetchRepoData(repoPath) {
-  return api.getGithubDataByPath(repoPath);
-}
-
-/* eslint-disable no-await-in-loop */
-async function getBatchPackageDetails(start, batchSize, packages) {
-  const stepPromises = [];
-  const stepPackages = packages.slice(start, start + batchSize);
-  for (let j = 0; j < batchSize; j++) {
-    const pkg = stepPackages[j];
-    stepPromises.push(
-      new Promise(async function(resolve, reject) {
-        try {
-          const repoPathname = await parsePypiRepoURL(
-            `${PACKAGE_HOST}${pkg.detailUrl}`,
-          );
-          const repoUrl = repoPathname
-            ? `https://github.com${repoPathname}`
-            : null;
-          resolve({
-            repoUrl,
-            detailUrl: pkg.detailUrl,
-          });
-        } catch (e) {
-          reject(e);
-        }
-      }),
-    );
-  }
-  return Promise.all(stepPromises);
-}
-
-/* eslint-disable no-await-in-loop */
-async function getPackageDetails(packages, step = 2, tab) {
-  for (let i = 0; i < packages.length; i += step) {
-    const results = await getBatchPackageDetails(i, step, packages);
-    chrome.tabs.sendMessage(tab.id, {
-      messageType: 'updateRepoUrl',
-      data: results,
-    });
-  }
-}
-
-/* eslint-disable no-await-in-loop */
-async function getBatchPubPackageDetails(start, batchSize, packages) {
-  const stepPromises = [];
-  const stepPackages = packages.slice(start, start + batchSize);
-  for (let j = 0; j < batchSize; j++) {
-    const pkg = stepPackages[j];
-    stepPromises.push(
-      new Promise(async function(resolve, reject) {
-        try {
-          const repoPathname = await parsePubRepoURL(
-            `${PUB_PACKAGE_HOST}${pkg.detailUrl}`,
-          );
-          const repoUrl = repoPathname
-            ? `https://github.com${repoPathname}`
-            : null;
-          resolve({
-            repoUrl,
-            detailUrl: pkg.detailUrl,
-          });
-        } catch (e) {
-          reject(e);
-        }
-      }),
-    );
-  }
-  return Promise.all(stepPromises);
-}
-
-/* eslint-disable no-await-in-loop */
-async function getPubPackageDetails(packages, step = 2, tab) {
-  for (let i = 0; i < packages.length; i += step) {
-    const results = await getBatchPubPackageDetails(i, step, packages);
-    chrome.tabs.sendMessage(tab.id, {
-      messageType: 'updateRepoUrl',
-      data: results,
-    });
+  async parseRepoUrl(packageURL) {
+    const config = {
+      responseType: 'document',
+      headers: {
+        Accept: 'text/html',
+      },
+    };
+    const response = await http.get(packageURL, config);
+    return this.parser.parse(response.data);
   }
 }
 
 async function handleEvent({ messageType, data }, sender, sendResponse) {
   let result = null;
-  let repoPath = null;
+  const github = new GithubParser(data);
   switch (messageType) {
-    case 'getRepoData':
-      repoPath = await parsePypiRepoURL(`${PACKAGE_HOST}${data}`);
-      if (repoPath === null) {
-        result = null;
-        break;
-      }
-      try {
-        result = await fetchRepoData(repoPath);
-      } catch (e) {
-        result = null;
-      }
-      break;
     case 'getGithubRepoData':
       try {
         result = await api.getGithubRepo(data);
@@ -146,10 +72,56 @@ async function handleEvent({ messageType, data }, sender, sendResponse) {
       }
       break;
     case 'parsePackageDetails':
-      getPackageDetails(data, 5, sender.tab);
+      await github.run(
+        {
+          parse(doc) {
+            const statsEl = doc.querySelector(
+              '#content [data-controller="github-repo-stats"]',
+            );
+            if (statsEl === null) {
+              return null;
+            }
+            const statsUrlText = statsEl.dataset.githubRepoStatsUrlValue;
+            const statsUrl = new URL(statsUrlText);
+            return statsUrl.pathname.replace('/repos', '');
+          },
+          host: PYTHON_PACKAGE_HOST,
+        },
+        sender.tab,
+      );
       break;
     case 'parsePubPackageDetails':
-      getPubPackageDetails(data, 5, sender.tab);
+      await github.run(
+        {
+          parse(doc) {
+            const linkEl = doc.querySelector('.detail-info-box .link');
+            const hrefAttr = linkEl.getAttribute('href');
+            if (linkEl === null || !hrefAttr.startsWith('https://github.com')) {
+              return null;
+            }
+            const statsUrl = new URL(hrefAttr);
+            return statsUrl.pathname;
+          },
+          host: PUB_PACKAGE_HOST,
+        },
+        sender.tab,
+      );
+      break;
+    case 'parseGemPackageDetails':
+      await github.run(
+        {
+          parse(doc) {
+            const btnEL = doc.querySelector('.github-btn');
+            if (!btnEL) {
+              return null;
+            }
+            console.log(btnEL);
+            return `/${btnEL.dataset.user}/${btnEL.dataset.repo}`;
+          },
+          host: GEM_PACKAGE_HOST,
+        },
+        sender.tab,
+      );
       break;
     default:
       break;
